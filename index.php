@@ -368,7 +368,8 @@ if (is_logged_in() && isset($_SESSION['login_time'])) {
             display: none;
             font-size: 1.5rem;
             cursor: pointer;
-            color: var(--text-color);
+            color: #2c3e50;
+            z-index: 1001;
         }
 
         @media (max-width: 768px) {
@@ -377,19 +378,56 @@ if (is_logged_in() && isset($_SESSION['login_time'])) {
             }
 
             .nav-links {
+                display: none;
                 position: fixed;
-                top: 70px;
-                left: -100%;
-                width: 100%;
-                height: calc(100vh - 70px);
-                background: white;
+                top: 0;
+                right: -100%;
+                width: 80%;
+                height: 100vh;
+                background: rgba(255, 255, 255, 0.98);
                 flex-direction: column;
-                padding: 2rem;
-                transition: left 0.3s ease;
+                padding: 5rem 2rem 2rem;
+                transition: right 0.3s ease;
+                box-shadow: -5px 0 15px rgba(0,0,0,0.1);
+                overflow-y: auto;
+                z-index: 1000;
             }
 
             .nav-links.active {
-                left: 0;
+                display: flex;
+                right: 0;
+            }
+
+            .nav-links a {
+                font-size: 1.2rem;
+                padding: 1rem 0;
+                width: 100%;
+                text-align: left;
+            }
+
+            .user-menu {
+                flex-direction: column;
+                background: none;
+                padding: 0;
+                gap: 1rem;
+                width: 100%;
+                margin-left: 0;
+            }
+
+            .create-post-btn, .login-btn, .logout-btn {
+                width: 100%;
+                text-align: center;
+                justify-content: center;
+                padding: 0.8rem;
+            }
+
+            .user-menu span {
+                text-align: left;
+                width: 100%;
+            }
+
+            .nav-content {
+                padding: 0 1rem;
             }
         }
 
@@ -948,6 +986,52 @@ if (is_logged_in() && isset($_SESSION['login_time'])) {
 
     <script src="script.js"></script>
     <script>
+        // Mobile menu toggle
+        document.addEventListener('DOMContentLoaded', function() {
+            const menuToggle = document.querySelector('.menu-toggle');
+            const navLinks = document.querySelector('.nav-links');
+            const body = document.body;
+
+            menuToggle.addEventListener('click', function(e) {
+                e.stopPropagation();
+                navLinks.classList.toggle('active');
+                body.style.overflow = navLinks.classList.contains('active') ? 'hidden' : '';
+                // Change menu icon
+                const icon = this.querySelector('i');
+                icon.classList.toggle('fa-bars');
+                icon.classList.toggle('fa-times');
+                navLinks.style.display = "block"
+            });
+
+            // Close menu when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!navLinks.contains(e.target) && !menuToggle.contains(e.target)) {
+                    navLinks.classList.remove('active');
+                    body.style.overflow = '';
+                    const icon = menuToggle.querySelector('i');
+                    icon.classList.add('fa-bars');
+                    icon.classList.remove('fa-times');
+                }
+            });
+
+            // Close menu when clicking on a link
+            const links = navLinks.querySelectorAll('a');
+            links.forEach(link => {
+                link.addEventListener('click', function() {
+                    navLinks.classList.remove('active');
+                    body.style.overflow = '';
+                    const icon = menuToggle.querySelector('i');
+                    icon.classList.add('fa-bars');
+                    icon.classList.remove('fa-times');
+                });
+            });
+
+            // Prevent menu from closing when clicking inside it
+            navLinks.addEventListener('click', function(e) {
+                e.stopPropagation();
+            });
+        });
+
         // AJAX form submission
         document.getElementById('contactForm').addEventListener('submit', function(e) {
             e.preventDefault();
